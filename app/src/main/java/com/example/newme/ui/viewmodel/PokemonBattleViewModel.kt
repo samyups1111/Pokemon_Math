@@ -3,17 +3,22 @@ package com.example.newme.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.newme.ui.model.Pokemon
-import com.example.newme.ui.model.PokemonBattlePageUiState
+import com.example.newme.model.Pokemon
+import com.example.newme.model.PokemonBattlePageUiState
 import com.example.newme.ui.repository.PokemonRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PokemonBattleViewModel(
-    private val repository: PokemonRepository,
+@HiltViewModel
+class PokemonBattleViewModel @Inject constructor(
+    public val repository: PokemonRepository,
 ): ViewModel() {
 
     init {
@@ -25,20 +30,6 @@ class PokemonBattleViewModel(
 
     val uiState: StateFlow<PokemonBattlePageUiState> = _uiState.asStateFlow()
 
-//    private val _battleMenuState = MutableStateFlow(BattleMenu.MAIN)
-//
-//    val battleMenuState: StateFlow<BattleMenu> = _battleMenuState.asStateFlow()
-//
-//    private val _pokemon = MutableStateFlow(Pokemon())
-//
-//    var pokemon: StateFlow<Pokemon> = _pokemon.asStateFlow()
-//
-//    private val _userTeam = MutableStateFlow(listOf(Pokemon()))
-//    val userTeam: StateFlow<List<Pokemon>> = _userTeam.asStateFlow()
-//
-//    private val _enemyTeam = MutableStateFlow(listOf(Pokemon()))
-//    val enemyTeam: StateFlow<List<Pokemon>> = _enemyTeam.asStateFlow()
-
     fun onFightClicked() {
         _uiState.value.battleMenuState = BattleMenu.ATTACK
     }
@@ -49,8 +40,15 @@ class PokemonBattleViewModel(
 
     private fun getUserTeam() {
         viewModelScope.launch(Dispatchers.IO) {
+
+
             repository.userTeam.collect {
-                _uiState.value.userTeam = it
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        userTeam = it
+                    )
+                }
+                Log.d("Sammy", "pokemon: $it")
             }
         }
     }

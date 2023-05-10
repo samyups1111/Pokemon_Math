@@ -1,20 +1,22 @@
-package com.example.newme.ui.navigation
+package com.example.newme.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.newme.ui.component.PokemonBattleRoute
+import androidx.navigation.compose.rememberNavController
+import com.example.newme.ui.pages.PokemonBattlePage
 
 @Composable
 fun PokemonAppNavHost(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
-    onNavigateToDestination: (PokemonAppNavigationDestination, String) -> Unit = { _, _ -> },
-    onBackClick: () -> Unit = {},
-    startDestination: String = PokemonBattleDestination.route,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = "pokemon_battle_route",
 ) {
+    Log.d("Sammy", "PokemonAppNavHost()")
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -24,7 +26,8 @@ fun PokemonAppNavHost(
         composable(
             route = startDestination,
         ) {
-            PokemonBattleRoute()
+            PokemonBattlePage()
         }
     }
 }
+

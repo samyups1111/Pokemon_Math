@@ -1,4 +1,4 @@
-package com.example.newme.ui.model
+package com.example.newme.model
 
 enum class PokemonType {
     ELECTRIC,

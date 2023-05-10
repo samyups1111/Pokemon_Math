@@ -1,11 +1,12 @@
-package com.example.newme.ui.services
+package com.example.newme.services
 
-import com.example.newme.ui.model.Pokemon
-import com.example.newme.ui.model.PokemonFromNetwork
+import com.example.newme.model.Pokemon
+import com.example.newme.model.PokemonFromNetwork
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import javax.inject.Inject
 
 interface PokemonApi {
 
@@ -19,7 +20,7 @@ interface PokemonApi {
     suspend fun getPokemonFromNetwork(@Path("id") id: Int): PokemonFromNetwork
 }
 
-class PokemonService {
+class PokemonService @Inject constructor() {
 
     private val retrofit by lazy {
         Retrofit.Builder()

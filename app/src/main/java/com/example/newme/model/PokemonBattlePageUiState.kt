@@ -1,4 +1,4 @@
-package com.example.newme.ui.model
+package com.example.newme.model
 
 import com.example.newme.ui.viewmodel.BattleMenu
 

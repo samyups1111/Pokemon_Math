@@ -1,4 +1,4 @@
-package com.example.newme.ui.model
+package com.example.newme.model
 
 import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName

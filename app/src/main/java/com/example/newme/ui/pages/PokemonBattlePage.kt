@@ -1,5 +1,6 @@
-package com.example.newme.ui.component
+package com.example.newme.ui.pages
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -33,34 +34,42 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.newme.R
-import com.example.newme.ui.model.PokemonBattlePageUiState
+import com.example.newme.model.PokemonBattlePageUiState
 import com.example.newme.ui.viewmodel.PokemonBattleViewModel
 
-@Composable
-fun PokemonBattleRoute(
-    viewModel: PokemonBattleViewModel = viewModel(),
-) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    PokemonBattlePage(
-        uiState
-    )
-
-}
 
 @Composable
 fun PokemonBattlePage(
+    modifier: Modifier = Modifier,
+    viewModel: PokemonBattleViewModel = hiltViewModel()
+) {
+    Log.d("Sammy", "PokemonBattePage()")
+    val uiState by viewModel.uiState.collectAsState()
+
+    PokemonBattleScreen(
+        uiState = uiState,
+        modifier = modifier,
+        onPkmnClicked = {  },
+        onFightClicked = { viewModel.onFightClicked() },
+        onMenuBackClicked = { viewModel.attackMenuOnBackClicked() },
+    )
+}
+
+@Composable
+fun PokemonBattleScreen(
     uiState: PokemonBattlePageUiState,
     modifier: Modifier = Modifier,
-    onFightClicked: () -> Unit = {},
-    onPkmnClicked: () -> Unit = {},
-    onItemClicked: () -> Unit = {},
-    onRunClicked: () -> Unit = {},
-    onMenuBackClicked: () -> Unit = {},
+    onFightClicked: () -> Unit = { },
+    onPkmnClicked: () -> Unit = { },
+    onItemClicked: () -> Unit = { },
+    onRunClicked: () -> Unit = { },
+    onMenuBackClicked: () -> Unit = { },
 ) {
+    Log.d("Sammy", "PokemonBattleScreen()")
+
     val battleMenuState = uiState.battleMenuState
     val userTeam = uiState.userTeam
     val enemyTeam = uiState.enemyTeam
@@ -69,41 +78,47 @@ fun PokemonBattlePage(
         modifier = modifier
             .fillMaxSize()
     ) {
-        Column {
-            PokemonBattleOpponent(
-                pokemonName = enemyTeam[0].name,
-                pokemonLevel = enemyTeam[0].level,
-                percentageHealth = enemyTeam[0].percentageHealth,
-                healthBarColor = enemyTeam[0].healthBarColor,
-                pokemonImgUrl = enemyTeam[0].sprites.frontDefault ?: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png",
-            )
-            PokemonBattleUser(
-                pokemonName = userTeam[0].name,
-                pokemonLevel = userTeam[0].level,
-                percentageHealth = userTeam[0].percentageHealth,
-                healthBarColor = userTeam[0].healthBarColor,
-                pokemonImageUrl = userTeam[0].sprites.backDefault ?: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png",
-            )
-            when (battleMenuState) {
-                com.example.newme.ui.viewmodel.BattleMenu.MAIN -> {
-                    BattleMenu(
-                        onFightClicked = { onFightClicked() },
-                        onPkmnClicked = {  },
-                        onItemClicked = { /*TODO*/ },
-                        onRunClicked = {  }
+        when (enemyTeam.isNotEmpty() && userTeam.isNotEmpty()) {
+            true -> {
+                Column {
+                    PokemonBattleOpponent(
+                        pokemonName = enemyTeam[0].name,
+                        pokemonLevel = enemyTeam[0].level,
+                        percentageHealth = enemyTeam[0].percentageHealth,
+                        healthBarColor = enemyTeam[0].healthBarColor,
+                        pokemonImgUrl = enemyTeam[0].sprites.frontDefault ?: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png",
                     )
-                }
-                com.example.newme.ui.viewmodel.BattleMenu.ATTACK -> {
-                    AttackMenu(
-                        attack1 = userTeam[0].moves[0].move.name,
-                        attack2 = userTeam[0].moves[1].move.name ?: "testing moves",
-                        onAttack1Clicked = { /*TODO*/ },
-                        onAttack2Clicked = { /*TODO*/ },
-                        onBackClicked = { onMenuBackClicked() }
+                    PokemonBattleUser(
+                        pokemonName = userTeam[0].name,
+                        pokemonLevel = userTeam[0].level,
+                        percentageHealth = userTeam[0].percentageHealth,
+                        healthBarColor = userTeam[0].healthBarColor,
+                        pokemonImageUrl = userTeam[0].sprites.backDefault ?: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png",
                     )
+                    when (battleMenuState) {
+                        com.example.newme.ui.viewmodel.BattleMenu.MAIN -> {
+                            BattleMenu(
+                                onFightClicked = { onFightClicked() },
+                                onPkmnClicked = {  },
+                                onItemClicked = { /*TODO*/ },
+                                onRunClicked = {  }
+                            )
+                        }
+                        com.example.newme.ui.viewmodel.BattleMenu.ATTACK -> {
+                            AttackMenu(
+                                attack1 = userTeam[0].moves[0].move.name,
+                                attack2 = userTeam[0].moves[1].move.name ?: "testing moves",
+                                onAttack1Clicked = { /*TODO*/ },
+                                onAttack2Clicked = { /*TODO*/ },
+                                onBackClicked = { onMenuBackClicked() }
+                            )
+                        }
+                    }
                 }
             }
-
+            false -> {
+                Text(text = "NO good")
+            }
         }
     }
 }
@@ -290,11 +305,11 @@ fun BattleMenu(
         ) {
             MenuBox(
                 menuName = "FIGHT",
-                onClick = onFightClicked,
+                onClick = { onFightClicked() },
             )
             MenuBox(
                 menuName = "PKMN",
-                onClick = onPkmnClicked,
+                onClick = { onPkmnClicked() },
             )
         }
         Row(
@@ -305,11 +320,11 @@ fun BattleMenu(
         ) {
             MenuBox(
                 menuName = "ITEM",
-                onClick = onItemClicked,
+                onClick = { onItemClicked() },
             )
             MenuBox(
                 menuName = "RUN",
-                onClick = onRunClicked,
+                onClick = { onRunClicked() },
             )
         }
     }
@@ -383,5 +398,5 @@ fun AttackMenu(
 @Preview
 @Composable
 fun HealthBarPreview() {
-    PokemonBattlePage(PokemonBattlePageUiState())
+    PokemonBattleScreen(PokemonBattlePageUiState())
 }

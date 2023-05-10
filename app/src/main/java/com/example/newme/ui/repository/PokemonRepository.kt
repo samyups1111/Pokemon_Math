@@ -1,11 +1,12 @@
 package com.example.newme.ui.repository
 
-import com.example.newme.ui.model.toPokemon
-import com.example.newme.ui.services.PokemonService
+import com.example.newme.model.toPokemon
+import com.example.newme.services.PokemonService
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class PokemonRepository(
-    private val pokemonService: PokemonService,
+class PokemonRepository @Inject constructor(
+    public val pokemonService: PokemonService,
 ) {
     val pokemons = flow {
         emit(pokemonService.getPokemons())
